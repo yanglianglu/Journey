@@ -1,2 +1,3 @@
 pandas=2.3
+airflow=2.12.3
 apache-airflow[amazon]=9.10.0

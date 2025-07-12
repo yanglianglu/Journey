@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   postgres:
     image: postgres:15
@@ -11,32 +10,46 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U airflow"]
-      interval: 10s
+      interval: 10s 
       retries: 5
+
+  localstack:
+    image: localstack/localstack:1.4
+    environment:
+      - SERVICES=s3,sqs,dynamodb,secretsmanager,mwaa
+      - AWS_DEFAULT_REGION=us-east-1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - localstack_data:/tmp/localstack
+    ports:
+      - "4566:4566"   # LocalStack edge port
+      - "4571:4571"   # MWAA endpoint port  [oai_citation:12‡Docs](https://docs.localstack.cloud/aws/services/mwaa/?utm_source=chatgpt.com)
 
   airflow-webserver:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     depends_on:
-      postgres:
-        condition: service_healthy
+      postgres: { condition: service_healthy }
+      localstack: { condition: service_started }
     environment:
-      &airflow-env
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      # Listen on all interfaces so VS Code can bind-forward
       AIRFLOW__WEBSERVER__WEB_SERVER_HOST: "0.0.0.0"
-      AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "8080"
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      # Point AWS Hooks/Operators to LocalStack:
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+      # Pre-create connexions: replace default
+      AIRFLOW_CONN_AWS_DEFAULT: aws://test:test@localstack:4566
     volumes:
-      - ..:/workspace              # Source code & DAGs
+      - ..:/workspace
       - airflow_logs:/opt/airflow/logs
-      - ~/.aws:/home/airflow/.aws:ro  # Optional: local AWS creds (read-only)
-    command: >
-      bash -c "scripts/init_airflow.sh && exec airflow webserver"
-
+      - ~/.aws:/home/airflow/.aws:ro
     ports:
-      - "8080:8080"   # Airflow UI
+      - "8080:8080"
+    command: bash -c "scripts/init_airflow.sh && exec airflow webserver"
     restart: unless-stopped
 
   airflow-scheduler:
@@ -44,10 +57,9 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     depends_on:
-      airflow-webserver:
-        condition: service_started
+      airflow-webserver: { condition: service_started }
     environment:
-      <<: *airflow-env
+      <<: *airflow-webserver.environment
     volumes:
       - ..:/workspace
       - airflow_logs:/opt/airflow/logs
@@ -57,15 +69,15 @@ services:
   airflow-flower:
     image: apache/airflow:2.9.0-python3.10
     depends_on:
-      airflow-webserver:
-        condition: service_started
+      airflow-webserver: { condition: service_started }
     environment:
-      <<: *airflow-env
+      <<: *airflow-webserver.environment
     command: ["airflow", "celery", "flower"]
     ports:
-      - "5555:5555"   # Flower UI
+      - "5555:5555"
     restart: unless-stopped
 
 volumes:
   postgres_data:
   airflow_logs:
+  localstack_data:

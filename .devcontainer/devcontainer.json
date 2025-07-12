@@ -1,39 +1,19 @@
-//devcontainer.json
 {
-  "name": "Node.js",
-
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/python:3.12",
-
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  // "features": {},
-
-  "customizations": {
-    "vscode": {
-      "settings": {},
-      "extensions": [
-        "streetsidesoftware.code-spell-checker",
-        "ms-python.vscode-pylance",
-        "ms-python.python",
-        "ms-python.debugpy",
-        "ms-toolsai.jupyter",
-        "openai.chatgpt",
-        "github.copilot",
-        "github.copilot-chat"
-      ]
-    }
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+  "name": "Airflow + AWS Dev Container",
+  "dockerComposeFile": [
+    "docker-compose.yaml"
+  ],
+  "service": "airflow-webserver",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [
+    8080,
+    5555,
+    4566
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/localstack/devcontainer-feature:2": {}
   },
-
-  // "forwardPorts": [3000],
-
-  "portsAttributes": {
-    "3000": {
-      "label": "Hello Remote World",
-      "onAutoForward": "notify"
-    }
-  },
-
-  "postCreateCommand": "yarn install"
-
-  // "remoteUser": "root"
+  "postCreateCommand": "scripts/init_airflow.sh"
 }

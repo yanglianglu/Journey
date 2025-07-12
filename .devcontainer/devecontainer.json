@@ -1,0 +1,24 @@
+{
+  "name": "Airflow Dev Container",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "dockerComposeFile": "docker-compose.yaml",
+  "service": "airflow-webserver",
+  "forwardPorts": [8080, 5555],
+  "features": { "ghcr.io/devcontainers/features/docker-in-docker:2": {} },
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "pip install -r requirements.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "batisteo.vscode-django",
+        "charliermarsh.ruff"
+      ]
+    }
+  }
+}

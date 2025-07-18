@@ -1,10 +1,10 @@
 {
+    "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.json",
     "name": "Airflow",
     "dockerComposeFile": ["../docker-compose.yaml"],
     "service": "airflow-webserver",
     "runServices": ["airflow-webserver", "airflow-scheduler", "postgres"],
     "workspaceFolder": "/workspace",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},
         "ghcr.io/devcontainers/features/python:1": {
@@ -12,5 +12,14 @@
         }
     },
     "forwardPorts": [8080],
-    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt"
+    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    }
 }

@@ -3,12 +3,10 @@ version: '3'
 services:
   postgres:
     image: postgres:15
-    environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+    env_file:
+      - .env
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'airflow']
+      test: ['CMD', 'pg_isready', '-U', '${POSTGRES_USER}']
       interval: 10s
       retries: 5
     volumes:
@@ -18,12 +16,8 @@ services:
     image: apache/airflow:2.10.0
     depends_on:
       - postgres
-    environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    env_file:
+      - .env
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
@@ -37,12 +31,8 @@ services:
     depends_on:
       - airflow-webserver
       - postgres
-    environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    env_file:
+      - .env
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs

@@ -85,3 +85,11 @@ def test_catchup_false_skips_past(monkeypatch):
         last_automated_data_interval=None, restriction=restriction
     )
     assert info.logical_date == pendulum.datetime(2025, 5, 23, 0, 0, tz=TZ)
+
+
+def test_serialize_roundtrip():
+    data = TT.serialize()
+    assert isinstance(data, dict)
+    tt2 = FridayAfterThirdWednesday.deserialize(data)
+    assert isinstance(tt2, FridayAfterThirdWednesday)
+    assert tt2._tz.name == "UTC"

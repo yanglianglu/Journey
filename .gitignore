@@ -6,3 +6,4 @@ tests/omega/__pycache__
 tests/omega/test_omega.pyc
 .pytest_cache
 .vscode
+logs

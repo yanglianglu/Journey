@@ -3,7 +3,7 @@ from __future__ import annotations
 import pendulum
 from airflow.decorators import dag, task
 from airflow.operators.empty import EmptyOperator
-from dags.plugins.friday_after_third_wednesday import FridayAfterThirdWednesday
+from friday_after_third_wednesday import FridayAfterThirdWednesday
 import holidays
 
 
@@ -16,7 +16,7 @@ def print_day(data_interval_start=None):
 @task.branch
 def branch_month(data_interval_start=None):
     month = data_interval_start.month
-    return "odd_month" if month % 2 else "even_month"
+    return "say_odd" if month % 2 else "say_even"
 
 
 @task
@@ -44,7 +44,7 @@ def list_us_holidays(data_interval_start=None, data_interval_end=None):
 @dag(
     dag_id="friday_after_third_wednesday_dag",
     start_date=pendulum.datetime(2024, 1, 1, tz="UTC"),
-    timetable=FridayAfterThirdWednesday(),
+    timetable=FridayAfterThirdWednesday("UTC"),
     catchup=False,
     tags=["example"],
 )

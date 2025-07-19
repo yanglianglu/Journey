@@ -97,11 +97,9 @@ class FridayAfterThirdWednesday(Timetable):
                 month = 1
                 year += 1
 
-    def serialize(self) -> tuple[str, dict]:
-        return (
-            f"{self.__module__}.{self.__class__.__name__}",
-            {"timezone": self._tz.name},          # everything JSON‑serialisable
-        )
+    def serialize(self) -> dict:
+        """Return JSON-serialisable state for Airflow DAG serialisation."""
+        return {"timezone": self._tz.name}
 
     @classmethod
     def deserialize(cls, data: dict) -> "FridayAfterThirdWednesday":

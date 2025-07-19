@@ -18,4 +18,6 @@ The web UI will be available at http://localhost:8080 with default credentials `
 
 Use the included **.devcontainer** configuration with VS Code to start a containerised
 development environment. This automatically builds the Airflow services using
-`docker-compose` and installs Python dependencies for you.
+`docker-compose`, installs Python dependencies, and connects as the `airflow`
+user so the Docker features install cleanly.
+

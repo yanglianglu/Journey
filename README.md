@@ -4,7 +4,7 @@ This repository includes sample Airflow DAGs and plugins.
 
 ## Local Airflow with Docker Compose
 
-To start a local Airflow 2.10 environment:
+To start a local Airflow 2.10 environment (using Python 3.11):
 
 ```bash
 # First time initialization

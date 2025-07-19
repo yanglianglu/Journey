@@ -18,7 +18,9 @@ def test_next_dagrun_info_first_time():
         latest=None,
         catchup=True,
     )
-    info = TT.next_dagrun_info(last_automated_dagrun=None, restriction=restriction)
+    info = TT.next_dagrun_info(
+        last_automated_data_interval=None, restriction=restriction
+    )
     assert info.logical_date == pendulum.datetime(2025, 1, 17, 0, 0, tz=TZ)
     assert info.data_interval == DataInterval(
         start=pendulum.datetime(2025, 1, 17, tz=TZ),
@@ -36,7 +38,9 @@ def test_next_dagrun_info_second_run():
         pendulum.datetime(2025, 1, 17, tz=TZ),
         pendulum.datetime(2025, 1, 18, tz=TZ),
     )
-    next_info = TT.next_dagrun_info(last_automated_dagrun=last_info, restriction=restriction)
+    next_info = TT.next_dagrun_info(
+        last_automated_data_interval=last_info.data_interval, restriction=restriction
+    )
     assert next_info.logical_date == pendulum.datetime(2025, 2, 21, 0, 0, tz=TZ)
 
 
@@ -64,7 +68,9 @@ def test_respects_latest():
         pendulum.datetime(2025, 1, 17, tz=TZ),
         pendulum.datetime(2025, 1, 18, tz=TZ),
     )
-    info = TT.next_dagrun_info(last_automated_dagrun=last_info, restriction=restriction)
+    info = TT.next_dagrun_info(
+        last_automated_data_interval=last_info.data_interval, restriction=restriction
+    )
     assert info is None
 
 
@@ -75,5 +81,7 @@ def test_catchup_false_skips_past(monkeypatch):
         catchup=False,
     )
     monkeypatch.setattr(pendulum, "now", lambda tz=None: pendulum.datetime(2025, 5, 1, tz=TZ))
-    info = TT.next_dagrun_info(last_automated_dagrun=None, restriction=restriction)
+    info = TT.next_dagrun_info(
+        last_automated_data_interval=None, restriction=restriction
+    )
     assert info.logical_date == pendulum.datetime(2025, 5, 23, 0, 0, tz=TZ)

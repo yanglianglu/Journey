@@ -3,7 +3,12 @@ from airflow.plugins_manager import AirflowPlugin
 from datetime import timedelta
 import pendulum
 
-from airflow.timetables.base import DagRunInfo, DataInterval, Timetable, TimeRestriction
+from airflow.timetables.base import (
+    DagRunInfo,
+    DataInterval,
+    Timetable,
+    TimeRestriction,
+)
 
 
 class FridayAfterThirdWednesday(Timetable):
@@ -33,6 +38,11 @@ class FridayAfterThirdWednesday(Timetable):
         third_wed = first_wed.add(weeks=2)
         return third_wed.add(days=2).start_of("day")  # -> Friday
 
+    # Backwards compatibility for tests expecting the old method name
+    def _target_friday(self, year: int, month: int) -> pendulum.DateTime:
+        """Alias for ``_target_for_month`` kept for testing purposes."""
+        return self._target_for_month(year, month)
+
     # ------------------------------------------------------------------ #
     # Trigger a manual run from the UI / REST API                         #
     # ------------------------------------------------------------------ #
@@ -53,12 +63,12 @@ class FridayAfterThirdWednesday(Timetable):
     def next_dagrun_info(
         self,
         *,
-        last_automated_dagrun: DagRunInfo | None,
+        last_automated_data_interval: DataInterval | None,
         restriction: TimeRestriction,
     ) -> DagRunInfo | None:
         # --- 1. establish a cursor date --------------------------------
-        if last_automated_dagrun:
-            cursor = last_automated_dagrun.data_interval.start.add(days=1)
+        if last_automated_data_interval:
+            cursor = last_automated_data_interval.end.in_timezone(self._tz)
         elif restriction.earliest:
             cursor = restriction.earliest.in_timezone(self._tz)
         else:

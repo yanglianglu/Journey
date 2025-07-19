@@ -3,7 +3,7 @@
     "name": "Airflow",
     "dockerComposeFile": ["../docker-compose.yaml"],
     "service": "airflow-webserver",
-    "runServices": ["airflow-webserver", "airflow-scheduler", "postgres"],
+
     "workspaceFolder": "/workspace",
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -13,7 +13,7 @@
     },
     "remoteUser": "airflow",
     "forwardPorts": [8080],
-    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && AIRFLOW_UID=$(id -u) docker compose run --rm airflow-webserver airflow db init && AIRFLOW_UID=$(id -u) docker compose up -d airflow-webserver airflow-scheduler postgres",
     "customizations": {
         "vscode": {
             "extensions": [

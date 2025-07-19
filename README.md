@@ -9,8 +9,7 @@ To start a local Airflow 2.10 environment:
 ```bash
 # First time initialization
 cp .env.example .env  # create local env file
-AIRFLOW_UID=$(id -u) docker compose up airflow-webserver airflow-scheduler postgres -d
-```
+
 
 The web UI will be available at http://localhost:8080 with default credentials `airflow/airflow`.
 
